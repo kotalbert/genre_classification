@@ -15,7 +15,7 @@ entry_points:
         type: str
         default: raw_data
       test_size:
-        description: Description for the artifact
+        description: Size of test sample
         type: float
       random_state:
         description: Integer to use to seed the random number generator
