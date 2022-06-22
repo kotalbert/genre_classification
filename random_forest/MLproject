@@ -1,4 +1,4 @@
-name: decision_tree
+name: random_forest
 conda_env: conda.yml
 
 entry_points:
@@ -8,7 +8,7 @@ entry_points:
         description: Fully-qualified name for the training data artifact
         type: str
       model_config:
-        description: JSON blurb containing the configuration for the decision tree
+        description: path to JSON blurb containing the configuration of random forest
         type: str
       export_artifact:
         description: Name for the artifact to use for the model export. Use "null" if you do not want to export.

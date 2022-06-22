@@ -59,7 +59,6 @@ def go(config: DictConfig):
             }
         )
 
-
     if "segregate" in steps_to_execute:
         _ = mlflow.run(
             os.path.join(root_path, "segregate"),
@@ -78,11 +77,24 @@ def go(config: DictConfig):
         # Serialize decision tree configuration
         model_config = os.path.abspath("random_forest_config.yml")
 
+        rf_pipeline = config["random_forest_pipeline"]
         with open(model_config, "w+") as fp:
-            fp.write(OmegaConf.to_yaml(config["random_forest_pipeline"]))
+            fp.write(OmegaConf.to_yaml(rf_pipeline))
 
-        ## YOUR CODE HERE: call the random_forest step
-        pass
+        _ = mlflow.run(
+            os.path.join(root_path, "random_forest"),
+            "main",
+            parameters={
+                "train_data": "sample_train.csv:latest",
+                "model_config": model_config,
+                "export_artifact": rf_pipeline["export_artifact"],
+                "random_seed": rf_pipeline["random_forest"]["random_state"],
+                "val_size": config["data"]["val_size"],
+                "stratify": config["data"]["stratify"]
+
+            }
+
+        )
 
     if "evaluate" in steps_to_execute:
         ## YOUR CODE HERE: call the evaluate step
