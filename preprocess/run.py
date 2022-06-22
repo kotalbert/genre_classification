@@ -12,7 +12,6 @@ logger = logging.getLogger()
 
 
 def go(args):
-
     run = wandb.init(job_type="process_data")
 
     logger.info("Downloading artifact")

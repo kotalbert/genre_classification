@@ -1,7 +1,9 @@
+import logging
+
 import mlflow
 import os
 import hydra
-from omegaconf import DictConfig, OmegaConf
+from omegaconf import DictConfig, OmegaConf, ListConfig
 
 
 # This automatically reads in the configuration
@@ -15,12 +17,13 @@ def go(config: DictConfig):
     root_path = hydra.utils.get_original_cwd()
 
     # Check which steps we need to execute
-    if isinstance(config["main"]["execute_steps"], str):
+    steps_ = config["main"]["execute_steps"]
+    if isinstance(steps_, str):
         # This was passed on the command line as a comma-separated list of steps
-        steps_to_execute = config["main"]["execute_steps"].split(",")
+        steps_to_execute = steps_.split(",")
     else:
-        assert isinstance(config["main"]["execute_steps"], list)
-        steps_to_execute = config["main"]["execute_steps"]
+        assert isinstance(steps_, ListConfig)
+        steps_to_execute = steps_
 
     input_artifact_name = "raw_data.parquet"
     if "download" in steps_to_execute:
