@@ -73,11 +73,11 @@ def go(config: DictConfig):
             }
         )
 
+    rf_pipeline = config["random_forest_pipeline"]
     if "random_forest" in steps_to_execute:
         # Serialize decision tree configuration
         model_config = os.path.abspath("random_forest_config.yml")
 
-        rf_pipeline = config["random_forest_pipeline"]
         with open(model_config, "w+") as fp:
             fp.write(OmegaConf.to_yaml(rf_pipeline))
 
@@ -97,8 +97,14 @@ def go(config: DictConfig):
         )
 
     if "evaluate" in steps_to_execute:
-        ## YOUR CODE HERE: call the evaluate step
-        pass
+        _ = mlflow.run(
+            os.path.join(root_path, "evaluate"),
+            "main",
+            parameters={
+                "model_export": f'{rf_pipeline["export_artifact"]}:latest',
+                "test_data": "sample_test.csv:latest"
+            }
+        )
 
 
 if __name__ == "__main__":
