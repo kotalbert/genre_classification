@@ -7,7 +7,6 @@ from omegaconf import DictConfig, OmegaConf
 # This automatically reads in the configuration
 @hydra.main(config_name='config')
 def go(config: DictConfig):
-
     # Setup the wandb experiment. All runs will be grouped under this name
     os.environ["WANDB_PROJECT"] = config["main"]["project_name"]
     os.environ["WANDB_RUN_GROUP"] = config["main"]["experiment_name"]
@@ -23,37 +22,40 @@ def go(config: DictConfig):
         assert isinstance(config["main"]["execute_steps"], list)
         steps_to_execute = config["main"]["execute_steps"]
 
-    # Download step
+    input_artifact_name = "raw_data.parquet"
     if "download" in steps_to_execute:
-
         _ = mlflow.run(
             os.path.join(root_path, "download"),
             "main",
             parameters={
                 "file_url": config["data"]["file_url"],
-                "artifact_name": "raw_data.parquet",
+                "artifact_name": input_artifact_name,
                 "artifact_type": "raw_data",
                 "artifact_description": "Data as downloaded"
             },
         )
 
     if "preprocess" in steps_to_execute:
-
-        ## YOUR CODE HERE: call the preprocess step
-        pass
+        _ = mlflow.run(
+            os.path.join(root_path, "preprocess"),
+            "main",
+            parameters={
+                "input_artifact": f"{input_artifact_name}:latest",
+                "artifact_name": "preprocessed_data.csv",
+                "artifact_type": "preprocessed_data",
+                "artifact_description": "Data preprocessed"
+            }
+        )
 
     if "check_data" in steps_to_execute:
-
         ## YOUR CODE HERE: call the check_data step
         pass
 
     if "segregate" in steps_to_execute:
-
         ## YOUR CODE HERE: call the segregate step
         pass
 
     if "random_forest" in steps_to_execute:
-
         # Serialize decision tree configuration
         model_config = os.path.abspath("random_forest_config.yml")
 
@@ -64,7 +66,6 @@ def go(config: DictConfig):
         pass
 
     if "evaluate" in steps_to_execute:
-
         ## YOUR CODE HERE: call the evaluate step
         pass
 
